@@ -1,6 +1,4 @@
-// ==========================================
-// 1. ИМПОРТ И НАСТРОЙКА FIREBASE
-// ==========================================
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -21,11 +19,9 @@ let movies = [];
 let schedule = [];
 let bookings = [];
 
-// ==========================================
-// 2. ЗАПУСК И СИНХРОНИЗАЦИЯ
-// ==========================================
-console.log("Приложение запущено...");
+console.log("App started...");
 
+// --- СЛУШАТЕЛИ ---
 onSnapshot(query(collection(db, "movies"), orderBy("id", "desc")), (snapshot) => {
     movies = [];
     snapshot.forEach((doc) => { movies.push({ fireId: doc.id, ...doc.data() }); });
@@ -43,22 +39,18 @@ onSnapshot(collection(db, "bookings"), (snapshot) => {
     bookings = [];
     snapshot.forEach((doc) => { bookings.push({ fireId: doc.id, ...doc.data() }); });
     
-    // Обновляем места в модалке
     const modal = document.getElementById('booking-modal');
     if(modal && modal.style.display === 'block') {
         const currentSessionId = modal.getAttribute('data-session-id');
         if(currentSessionId) window.generateSeats(Number(currentSessionId));
     }
     
-    // Обновляем админку
-    if(document.getElementById('admin-dashboard').style.display === 'block') {
-        window.showBookingsList();
+    if(document.getElementById('admin-bookings-list')) {
+        window.showBookingsList(); // Если мы в админке
     }
 });
 
-// ==========================================
-// 3. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-// ==========================================
+// --- ФАЙЛЫ ---
 let currentFileBase64 = null;
 const fileInput = document.getElementById('admin-movie-file');
 const fileNameDisplay = document.getElementById('file-name-display');
@@ -96,9 +88,7 @@ function showToast(msg, type='normal') {
     setTimeout(() => el.remove(), 3000);
 }
 
-// ==========================================
-// 4. НАВИГАЦИЯ И ОТРИСОВКА
-// ==========================================
+// --- НАВИГАЦИЯ ---
 window.navigate = function(pageId) {
     document.querySelectorAll('section').forEach(s => {
         s.style.display = 'none';
@@ -118,9 +108,9 @@ window.navigate = function(pageId) {
     document.getElementById('nav-menu').classList.remove('active');
     window.scrollTo(0,0);
 }
-
 window.toggleMenu = function() { document.getElementById('nav-menu').classList.toggle('active'); }
 
+// --- ОТРИСОВКА ---
 function renderMovies() {
     const grid = document.getElementById('movies-grid');
     if(!grid) return;
@@ -180,9 +170,7 @@ function renderSchedule() {
     });
 }
 
-// ==========================================
-// 5. ЛОГИКА БРОНИРОВАНИЯ (МУЛЬТИ-ВЫБОР + СТАТУСЫ)
-// ==========================================
+// --- БРОНИРОВАНИЕ (МУЛЬТИ) ---
 let currentSessionId = null;
 let selectedSeats = [];
 
@@ -197,9 +185,9 @@ window.openBooking = function(sessionId) {
     
     const sess = schedule.find(s => s.id == sessionId);
     const m = movies.find(x => x.id == sess.movieId);
+    
     document.getElementById('booking-movie-title').innerText = m.title;
     document.getElementById('booking-info').innerText = `${sess.day} | ${sess.time}`;
-    
     window.generateSeats(sessionId);
     window.openModal('booking-modal');
 }
@@ -218,13 +206,17 @@ window.generateSeats = function(sessionId) {
             const seatDiv = document.createElement('div');
             seatDiv.className = 'seat';
             
+            // Проверка занятости
             const booking = occupied.find(b => b.row === r && b.seat === c);
             
             if (booking) {
-                seatDiv.classList.add('occupied');
-                // Если статус pending - красим в Желтый, иначе (confirmed) в Красный (через occupied)
-                if (booking.status === 'pending') seatDiv.classList.add('pending');
+                seatDiv.classList.add('occupied'); // Красный по умолчанию (занято)
+                if (booking.status === 'pending') {
+                    seatDiv.classList.remove('occupied'); // Убираем красный
+                    seatDiv.classList.add('pending'); // Добавляем желтый
+                }
             } else {
+                // Если выбрано нами сейчас
                 const isSelected = selectedSeats.some(s => s.row === r && s.seat === c);
                 if (isSelected) seatDiv.classList.add('selected');
                 seatDiv.onclick = () => window.toggleSeatSelection(r, c, seatDiv);
@@ -244,8 +236,10 @@ window.toggleSeatSelection = function(r, c, el) {
         selectedSeats.push({ row: r, seat: c });
         el.classList.add('selected');
     }
+
     const display = document.getElementById('selected-seat-display');
     const btn = document.getElementById('confirm-booking-btn');
+
     if (selectedSeats.length === 0) {
         display.innerText = "Выберите места";
         btn.disabled = true;
@@ -268,25 +262,25 @@ window.submitBooking = async function() {
                 scheduleId: currentSessionId,
                 row: seat.row,
                 seat: seat.seat,
-                status: 'pending', // ЖДЕТ ОПЛАТЫ
+                status: 'pending', // Желтый статус
                 timestamp: Date.now()
             });
         });
+
         await Promise.all(promises);
         
-        // ФОРМИРУЕМ WHATSAPP
         const seatsList = selectedSeats.map(s => `- Ряд ${s.row}, Место ${s.seat}`).join('\n');
         const rawText = `Здравствуйте! Бронирую билеты (${selectedSeats.length} шт):\n` +
                         `🎬 Фильм: ${m.title}\n` +
                         `⏰ Сеанс: ${sess.day} ${sess.time}\n\n` +
                         `💺 Места:\n${seatsList}\n\n` +
-                        `Жду реквизиты для оплаты.`;
+                        `Жду подтверждения. Как оплатить?`;
 
         const encodedText = encodeURIComponent(rawText);
         window.location.href = `https://wa.me/996702444888?text=${encodedText}`;
 
         window.closeBookingModal();
-        showToast('Бронь создана (Желтая). Ожидаем оплату...', 'success');
+        showToast(`Успешно! Места забронированы.`, 'success');
     } catch (e) {
         console.error(e);
         showToast('Ошибка: ' + e.message, 'error');
@@ -297,9 +291,7 @@ window.closeBookingModal = function() {
     document.getElementById('booking-modal').style.display = 'none'; 
 }
 
-// ==========================================
-// 6. АДМИНКА
-// ==========================================
+// --- АДМИНКА ---
 let adminModeActive = false;
 window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; }
 window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
@@ -336,6 +328,7 @@ function updateAdminUI() {
         opt.innerText = m.title;
         sel.appendChild(opt);
     });
+
     const list = document.getElementById('admin-movies-list');
     list.innerHTML = '';
     movies.forEach(m => {
@@ -345,11 +338,12 @@ function updateAdminUI() {
     });
 }
 
+// CRUD
 window.addMovie = async function() {
     const title = document.getElementById('admin-movie-title').value;
     const poster = currentFileBase64 || document.getElementById('admin-movie-poster-url').value;
     const genre = document.getElementById('admin-movie-genre').value;
-    if(!title) return showToast('Название обязательно', 'error');
+    if(!title) return showToast('Введите название', 'error');
     
     await addDoc(collection(db, "movies"), {
         id: Date.now(), title, poster: poster || '', genre: genre || 'Кино'
@@ -381,10 +375,11 @@ window.deleteSession = async function(fireId) {
     if(confirm('Удалить сеанс?')) await deleteDoc(doc(db, "schedule", fireId));
 }
 
-// --- СПИСОК БРОНЕЙ ---
+// --- УПРАВЛЕНИЕ БРОНЯМИ В АДМИНКЕ ---
 window.showBookingsList = function() {
     const tbody = document.getElementById('bookings-table-body');
     const noData = document.getElementById('no-bookings-msg');
+    
     if(!tbody) return;
     tbody.innerHTML = '';
     
@@ -394,70 +389,62 @@ window.showBookingsList = function() {
     }
     if(noData) noData.style.display = 'none';
 
-    // Сортировка: сначала Ждет оплаты, потом Оплачено
+    // Сортировка: Сначала желтые (Pending), потом красные
     bookings.sort((a, b) => (a.status === 'pending' ? -1 : 1));
 
     bookings.forEach(b => {
         const sess = schedule.find(s => s.id == b.scheduleId);
         const m = sess ? movies.find(mov => mov.id == sess.movieId) : null;
         
-        let statusBadge = '', confirmBtn = '';
+        let statusBadge = '';
+        let actions = '';
+
         if (b.status === 'pending') {
-            statusBadge = '<span style="color:#f39c12; font-weight:bold;">Ждет оплаты</span>';
-            confirmBtn = `<button class="btn-small btn-success" onclick="confirmBooking('${b.fireId}')"><i class="fas fa-check"></i></button>`;
+            statusBadge = '<span style="color:#f1c40f; font-weight:bold;">● Ожидает</span>';
+            actions = `
+                <button class="btn-small btn-approve" onclick="confirmBooking('${b.fireId}')" title="Подтвердить">✅</button>
+                <button class="btn-small btn-danger" onclick="deleteSingleBooking('${b.fireId}')" title="Отклонить">❌</button>
+            `;
         } else {
-            statusBadge = '<span style="color:#25D366; font-weight:bold;">Оплачено</span>';
+            statusBadge = '<span style="color:#880b12; font-weight:bold;">● Оплачено</span>';
+            actions = `
+                <button class="btn-small btn-danger" onclick="deleteSingleBooking('${b.fireId}')" title="Удалить">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
         }
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td><strong>${m ? m.title : '???'}</strong><br><small>${sess ? sess.day + ' ' + sess.time : '???'}</small></td>
+            <td>
+                <strong>${m ? m.title : '???'}</strong><br>
+                <small>${sess ? sess.day + ' ' + sess.time : '???'}</small>
+            </td>
             <td>Р${b.row} М${b.seat}</td>
             <td>${statusBadge}</td>
-            <td style="text-align:right;">
-                ${confirmBtn}
-                <button class="btn-danger btn-small" onclick="deleteSingleBooking('${b.fireId}')"><i class="fas fa-times"></i></button>
-            </td>
+            <td style="text-align: right;">${actions}</td>
         `;
         tbody.appendChild(tr);
     });
 }
 
-// Подтверждение оплаты (Желтый -> Красный)
 window.confirmBooking = async function(fireId) {
     try {
         await updateDoc(doc(db, "bookings", fireId), { status: 'confirmed' });
-        showToast('Оплата подтверждена!', 'success');
+        showToast('Бронь подтверждена!', 'success');
     } catch(e) { showToast('Ошибка', 'error'); }
 }
 
 window.deleteSingleBooking = async function(fireId) {
-    if(confirm('Отменить бронь? Место освободится.')) {
+    if(confirm('Удалить эту бронь?')) {
         await deleteDoc(doc(db, "bookings", fireId));
         showToast('Бронь удалена');
     }
 }
 
-// ОЧИСТКА СТАРЫХ БРОНЕЙ (Ожидающих > 30 мин)
-window.cleanupOldBookings = async function() {
-    if(!confirm('Удалить все неоплаченные брони старше 30 минут?')) return;
-    
-    const now = Date.now();
-    const timeLimit = 30 * 60 * 1000; // 30 минут в миллисекундах
-    let deletedCount = 0;
-
-    bookings.forEach(async (b) => {
-        if (b.status === 'pending' && (now - b.timestamp > timeLimit)) {
-            await deleteDoc(doc(db, "bookings", b.fireId));
-            deletedCount++;
-        }
-    });
-    showToast('Очистка завершена', 'success');
-}
-
 window.resetBookings = async function() {
-    if(confirm('Сбросить ВЕСЬ ЗАЛ? Это удалит даже оплаченные билеты!')) {
+    if(confirm('Удалить ВСЕ брони?')) {
         bookings.forEach(async (b) => await deleteDoc(doc(db, "bookings", b.fireId)));
-        showToast('Зал полностью очищен');
+        showToast('Зал очищен');
     }
 }
