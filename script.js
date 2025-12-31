@@ -31,7 +31,6 @@ let bookings = [];
 console.log("Приложение запущено...");
 
 // --- Слушаем Фильмы ---
-// Используем imported функции напрямую: query, collection, orderBy
 onSnapshot(query(collection(db, "movies"), orderBy("id", "desc")), (snapshot) => {
     movies = [];
     snapshot.forEach((doc) => {
@@ -478,7 +477,7 @@ window.showBookingsList = function() {
             <td>${m ? m.title : '<span style="color:red">Фильм удален</span>'}</td>
             <td>${sess ? sess.day + ' ' + sess.time : '<span style="color:red">Сеанс удален</span>'}</td>
             <td>Ряд ${b.row}, Место ${b.seat}</td>
-            <td>
+            <td style="text-align: right;">
                 <button class="btn-danger btn-small" onclick="deleteSingleBooking('${b.fireId}')">
                     <i class="fas fa-times"></i>
                 </button>
@@ -504,4 +503,3 @@ window.resetBookings = async function() {
         showToast('Зал очищается...');
     }
 }
-
