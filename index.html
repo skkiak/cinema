@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Кинотеатр ЖАШТЫК | Официальный сайт</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="container nav-container">
+            <div class="logo">
+                <img src="unnamed.jpg" alt="Logo" onerror="this.src='https://via.placeholder.com/50/e50914/ffffff?text=J'">
+                <span>ЖАШТЫК</span>
+            </div>
+            <div class="mobile-toggle" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu" id="nav-menu">
+                <li class="nav-link active" onclick="navigate('home')">Главная</li>
+                <li class="nav-link" onclick="navigate('schedule')">Расписание</li>
+                <li class="nav-link" onclick="navigate('contacts')">Контакты</li>
+                <li class="nav-link" style="color: var(--whatsapp);" onclick="window.open('https://wa.me/996702444888', '_blank')">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </li>
+            </ul>
+        </div>
+    </header>
+
+    <section id="home" class="active">
+        <div id="hero">
+            <div class="container hero-content fade-in">
+                <h1>БОЛЬШОЕ КИНО<br><span style="color: var(--primary);"> ЖАШТЫК</span></h1>
+                <p>Погрузись в мир магии кино с лучшим звуком и изображением.</p>
+                <button class="btn" onclick="navigate('schedule')">Купить билет</button>
+            </div>
+        </div>
+
+        <div class="container" style="padding-top: 60px;">
+            <h2 class="section-title">В прокате</h2>
+            <div class="movies-grid" id="movies-grid"></div>
+        </div>
+    </section>
+
+    <section id="schedule">
+        <div class="container">
+            <h2 class="section-title">Расписание и Билеты</h2>
+            <div id="schedule-container" class="fade-in"></div>
+        </div>
+    </section>
+
+    <section id="contacts">
+        <div class="container fade-in">
+            <h2 class="section-title">Контакты</h2>
+            <div class="contacts-wrapper">
+                <div class="contact-box">
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div class="info">
+                            <h4>Адрес:</h4>
+                            <p>г. Кара-Балта, ул. Кожомбердиева, 119</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fab fa-whatsapp" style="color: var(--whatsapp);"></i>
+                        <div class="info">
+                            <h4>Бронь / Касса:</h4>
+                            <p><a href="https://wa.me/996702444888" style="color: white;">+996 702 444 888</a></p>
+                        </div>
+                    </div>
+                    <a href="https://wa.me/996702444888" target="_blank" class="btn btn-whatsapp" style="width: 100%; margin-top: 20px;">
+                        <i class="fab fa-whatsapp"></i> Написать в WhatsApp
+                    </a>
+                </div>
+                
+                <div class="map-placeholder">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2928.324838421034!2d73.8475!3d42.8205!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDLCsDQ5JzEzLjgiTiA3M8KwNTAnNTEuMCJF!5e0!3m2!1sru!2skg!4v1600000000000!5m2!1sru!2skg" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="admin-dashboard">
+        <div class="container">
+            <div class="admin-top-bar">
+                <h2 class="brand-font" style="margin:0;">Панель Управления</h2>
+                <div class="admin-actions">
+                    <button class="btn btn-outline btn-small" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+                </div>
+            </div>
+
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h3 class="admin-card-title"><i class="fas fa-film"></i> Добавить Фильм</h3>
+                    <div class="form-group">
+                        <input type="text" id="admin-movie-title" class="form-input" placeholder="Название фильма">
+                    </div>
+                    <div class="form-group">
+    <label>Постер (Файл):</label>
+    <div class="custom-file-upload">
+        <input type="file" id="admin-movie-file" accept="image/*">
+        <label for="admin-movie-file" class="upload-btn">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span id="file-name-display">Выбрать изображение...</span>
+        </label>
+    </div>
+</div>
+                    <div class="divider"><span>ИЛИ ССЫЛКА</span></div>
+                    <div class="form-group">
+                        <input type="text" id="admin-movie-poster-url" class="form-input" placeholder="URL картинки">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="admin-movie-genre" class="form-input" placeholder="Жанр (Боевик, Драма...)">
+                    </div>
+                    <button class="btn btn-full" onclick="addMovie()">Сохранить фильм</button>
+                    
+                    <div class="list-container">
+                        <h4>Удаление фильмов:</h4>
+                        <ul id="admin-movies-list" class="simple-list"></ul>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <h3 class="admin-card-title"><i class="fas fa-clock"></i> Добавить Сеанс</h3>
+                    <div class="form-group">
+                        <label>Фильм</label>
+                        <select id="admin-session-movie" class="form-input"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>День</label>
+                        <select id="admin-session-day" class="form-input">
+                            <option value="Сегодня">Сегодня</option>
+                            <option value="Завтра">Завтра</option>
+                            <option value="Понедельник">Понедельник</option>
+                            <option value="Вторник">Вторник</option>
+                            <option value="Среда">Среда</option>
+                            <option value="Четверг">Четверг</option>
+                            <option value="Пятница">Пятница</option>
+                            <option value="Суббота">Суббота</option>
+                            <option value="Воскресенье">Воскресенье</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Время</label>
+                        <input type="time" id="admin-session-time" class="form-input">
+                    </div>
+                    <button class="btn btn-full" onclick="addSession()">Создать сеанс</button>
+                </div>
+            </div>
+            
+            <div class="admin-card full-width" style="margin-top: 30px;">
+                <div class="card-header-flex">
+                    <h3 class="admin-card-title"><i class="fas fa-ticket-alt"></i> Активные брони</h3>
+                    <button class="btn btn-small btn-danger" onclick="resetBookings()">Очистить всё</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>Фильм</th>
+                                <th>Сеанс</th>
+                                <th>Место</th>
+                                <th>Действие</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookings-table-body">
+                            </tbody>
+                    </table>
+                </div>
+                <p id="no-bookings-msg" style="text-align: center; color: #666; margin-top: 20px;">Нет активных броней</p>
+            </div>
+        </div>
+    </section>
+
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('login-modal')">&times;</span>
+            <h3>Вход для персонала</h3>
+            <p style="color:#888; margin-bottom: 20px;">Введите PIN-код для доступа</p>
+            <input type="password" id="login-pass" class="form-input center-text" placeholder="PIN">
+            <button class="btn btn-full" onclick="attemptLogin()">Войти</button>
+        </div>
+    </div>
+
+    <div id="booking-modal" class="modal">
+        <div class="modal-content large-modal">
+            <span class="close-modal" onclick="closeBookingModal()">&times;</span>
+            <div class="modal-header">
+                <h3 id="booking-movie-title">Название фильма</h3>
+                <p id="booking-info">Сегодня | 14:00</p>
+            </div>
+            
+            <div class="screen-container">
+                <div class="booking-screen">ЭКРАН</div>
+            </div>
+            
+            <div class="seats-container" id="seats-grid"></div>
+
+            <div class="seat-legend">
+                <div class="legend-item"><div class="dot free"></div> Свободно</div>
+                <div class="legend-item"><div class="dot selected"></div> Выбор</div>
+                <div class="legend-item"><div class="dot occupied"></div> Занято</div>
+            </div>
+            
+            <div class="booking-footer">
+                <p id="selected-seat-display">Выберите место</p>
+                <p class="payment-hint"><i class="fab fa-whatsapp"></i> Оплата через WhatsApp (MBank / QR)</p>
+                <button class="btn btn-whatsapp btn-full" id="confirm-booking-btn" onclick="submitBooking()" disabled>
+                    Забронировать
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Кинотеатр «Жаштык»</p>
+            <div class="admin-trigger" onclick="openModal('login-modal')">
+                <i class="fas fa-lock"></i>
+            </div>
+        </div>
+    </footer>
+
+   <script src="script.js" type="module">
+        // Импортируем функции из Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // ТВОЯ КОНФИГУРАЦИЯ
+        const firebaseConfig = {
+            apiKey: "AIzaSyAehkl3LCxbd07zHWASbcJSQpfcDv8mmEE",
+            authDomain: "jashtyk-cinema.firebaseapp.com",
+            projectId: "jashtyk-cinema",
+            storageBucket: "jashtyk-cinema.firebasestorage.app",
+            messagingSenderId: "566863733816",
+            appId: "1:566863733816:web:64803fcc5feba28719b2cd",
+            measurementId: "G-G2MX1N36JP"
+        };
+
+        // Запуск Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // Делаем базу доступной глобально для jashtyk.js
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
+        window.onSnapshot = onSnapshot;
+        window.query = query;
+        window.orderBy = orderBy;
+
+        // Запускаем основной скрипт сайта
+        import("./jashtyk.js");
+    </script>
+</body>
+</html>
