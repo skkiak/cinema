@@ -239,39 +239,7 @@
     </footer>
 
    <script src="script.js" type="module">
-        // Импортируем функции из Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
-        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // ТВОЯ КОНФИГУРАЦИЯ
-        const firebaseConfig = {
-            apiKey: "AIzaSyAehkl3LCxbd07zHWASbcJSQpfcDv8mmEE",
-            authDomain: "jashtyk-cinema.firebaseapp.com",
-            projectId: "jashtyk-cinema",
-            storageBucket: "jashtyk-cinema.firebasestorage.app",
-            messagingSenderId: "566863733816",
-            appId: "1:566863733816:web:64803fcc5feba28719b2cd",
-            measurementId: "G-G2MX1N36JP"
-        };
-
-        // Запуск Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const db = getFirestore(app);
-
-        // Делаем базу доступной глобально для jashtyk.js
-        window.db = db;
-        window.collection = collection;
-        window.addDoc = addDoc;
-        window.deleteDoc = deleteDoc;
-        window.doc = doc;
-        window.onSnapshot = onSnapshot;
-        window.query = query;
-        window.orderBy = orderBy;
-
-        // Запускаем основной скрипт сайта
-        import("./jashtyk.js");
     </script>
 </body>
+
 </html>
