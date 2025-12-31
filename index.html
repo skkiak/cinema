@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Кинотеатр ЖАШТЫК | Панель управления</title>
+    <title>Кинотеатр ЖАШТЫК | Официальный сайт</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -122,10 +122,10 @@
                     </div>
                     <div class="divider"><span>ИЛИ ССЫЛКА</span></div>
                     <div class="form-group">
-                        <input type="text" id="admin-movie-poster-url" class="form-input" placeholder="https://...">
+                        <input type="text" id="admin-movie-poster-url" class="form-input" placeholder="URL картинки">
                     </div>
                     <div class="form-group">
-                        <input type="text" id="admin-movie-genre" class="form-input" placeholder="Жанр (Драма, Боевик)">
+                        <input type="text" id="admin-movie-genre" class="form-input" placeholder="Жанр">
                     </div>
                     <button class="btn btn-full" onclick="addMovie()">Сохранить фильм</button>
                     
@@ -142,7 +142,7 @@
                         <select id="admin-session-movie" class="form-input"></select>
                     </div>
                     <div class="form-group">
-                        <label>День недели</label>
+                        <label>День</label>
                         <select id="admin-session-day" class="form-input">
                             <option value="Сегодня">Сегодня</option>
                             <option value="Завтра">Завтра</option>
@@ -156,7 +156,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Время начала</label>
+                        <label>Время</label>
                         <input type="time" id="admin-session-time" class="form-input">
                     </div>
                     <button class="btn btn-full" onclick="addSession()">Создать сеанс</button>
@@ -165,24 +165,28 @@
             
             <div class="admin-card full-width" style="margin-top: 30px;">
                 <div class="card-header-flex">
-                    <h3 class="admin-card-title"><i class="fas fa-ticket-alt"></i> Бронирование мест</h3>
-                    <button class="btn btn-small btn-danger" onclick="resetBookings()">
-                        <i class="fas fa-trash"></i> Очистить весь зал
-                    </button>
+                    <h3 class="admin-card-title"><i class="fas fa-ticket-alt"></i> Статус зала</h3>
+                    <div>
+                        <button class="btn btn-small btn-outline" onclick="cleanupOldBookings()" style="margin-right: 10px;">
+                            <i class="fas fa-history"></i> Очистить просроченные
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="resetBookings()">
+                            <i class="fas fa-trash"></i> Сброс всего зала
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="table-responsive">
                     <table class="bookings-table">
                         <thead>
                             <tr>
-                                <th>Фильм</th>
-                                <th>Сеанс</th>
+                                <th>Фильм / Время</th>
                                 <th>Место</th>
+                                <th>Статус</th>
                                 <th style="text-align: right;">Действие</th>
                             </tr>
                         </thead>
-                        <tbody id="bookings-table-body">
-                            </tbody>
+                        <tbody id="bookings-table-body"></tbody>
                     </table>
                 </div>
                 <p id="no-bookings-msg" style="text-align: center; color: #666; margin-top: 20px;">Броней пока нет</p>
@@ -217,12 +221,13 @@
             <div class="seat-legend">
                 <div class="legend-item"><div class="dot free"></div> Свободно</div>
                 <div class="legend-item"><div class="dot selected"></div> Выбор</div>
+                <div class="legend-item"><div class="dot pending"></div> Оплата...</div>
                 <div class="legend-item"><div class="dot occupied"></div> Занято</div>
             </div>
             
             <div class="booking-footer">
                 <p id="selected-seat-display">Выберите места</p>
-                <p class="payment-hint"><i class="fab fa-whatsapp"></i> Оплата через WhatsApp (MBank / QR)</p>
+                <p class="payment-hint"><i class="fab fa-whatsapp"></i> Вас перекинет в WhatsApp для оплаты</p>
                 <button class="btn btn-whatsapp btn-full" id="confirm-booking-btn" onclick="submitBooking()" disabled>
                     Забронировать
                 </button>
