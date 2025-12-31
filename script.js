@@ -298,7 +298,7 @@ window.submitBooking = async function() {
     const m = movies.find(x => x.id == sess.movieId);
 
     try {
-        // Сохраняем в Firebase
+        // 1. Сохраняем в базу (как и раньше)
         await addDoc(collection(db, "bookings"), {
             id: Date.now(),
             scheduleId: currentSessionId,
@@ -307,12 +307,21 @@ window.submitBooking = async function() {
             timestamp: Date.now()
         });
         
-        // Открываем WhatsApp
-        const message = `Здравствуйте! Бронирую билет:%0AФильм: ${m.title}%0AСеанс: ${sess.day} ${sess.time}%0AРяд: ${selectedSeat.row}, Место: ${selectedSeat.seat}%0A%0AКак оплатить по QR?`;
-        window.open(`https://wa.me/996702444888?text=${message}`, '_blank');
+        // 2. Формируем красивый текст
+        const rawText = `Здравствуйте! Бронирую билет:\n` +
+                        `🎬 Фильм: ${m.title}\n` +
+                        `⏰ Сеанс: ${sess.day} ${sess.time}\n` +
+                        `💺 Место: Ряд ${selectedSeat.row}, Место ${selectedSeat.seat}\n\n` +
+                        `Как оплатить по QR?`;
+
+        // 3. ВАЖНО: Кодируем текст для мобильных устройств
+        const encodedText = encodeURIComponent(rawText);
+        
+        // 4. Перенаправляем в WhatsApp (location.href надежнее для телефонов)
+        window.location.href = `https://wa.me/996702444888?text=${encodedText}`;
 
         window.closeBookingModal();
-        showToast('Успешно! Место забронировано.', 'success');
+        // showToast удалил, так как страница все равно перейдет в ватсап
     } catch (e) {
         console.error(e);
         showToast('Ошибка: ' + e.message, 'error');
@@ -495,3 +504,4 @@ window.resetBookings = async function() {
         showToast('Зал очищается...');
     }
 }
+
